@@ -1,0 +1,30 @@
+@startuml
+!define ENTITY class
+
+!define PRIMARY_KEY_FIELD <b>[PK]</b>
+
+ENTITY Customer {
+  + customer_id : long PRIMARY_KEY_FIELD
+  + name : string
+  + birthdate : date
+  + transaction_count : int
+}
+
+ENTITY Transaction {
+  + transaction_id : long PRIMARY_KEY_FIELD
+  + transaction_date : date
+  + amount : decimal
+  + customer_id : long
+}
+
+ENTITY FilteredData {
+  + filtered_data_id : long PRIMARY_KEY_FIELD
+  + additional_attributes : string
+  + customer_id : long
+  + transaction_id : long
+}
+
+Customer --|{ Transaction : имеет
+FilteredData --|{ Customer : принадлежит
+FilteredData --|{ Transaction : принадлежит
+@enduml

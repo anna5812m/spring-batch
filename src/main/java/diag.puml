@@ -1,0 +1,71 @@
+@startuml
+
+package com.filterdata {
+    class BatchApplication {
+        +main(String[] args)
+        +prepareTestData(int amount)
+        -random(int start, int end): int
+    }
+
+    class BirthdayFilterProcessor {
+        +process(Customer item): Customer
+    }
+
+    class Customer {
+        +toString(): String
+    }
+
+    class CustomerItemReader {
+        +read(): Customer
+        -customers(): List<Customer>
+    }
+
+    class CustomerItemWriter {
+        +write(List<? extends Customer> items)
+        +close()
+    }
+
+    class CustomerReportJobConfig {
+        +destroy()
+        +run()
+        +customerReportJob(): Job
+        +taskletStep(): Step
+        +chunkStep(): Step
+        +reader(): ItemReader<Customer>
+        +processor(): ItemProcessor<Customer, Customer>
+        +birthdayFilterProcessor(): BirthdayFilterProcessor
+        +transactionValidatingProcessor(): TransactionValidatingProcessor
+        +writer(): ItemWriter<Customer>
+        +tasklet(): Tasklet
+    }
+
+    class TransactionValidatingProcessor {
+        +TransactionValidatingProcessor(int limit)
+    }
+}
+
+com.filterdata.BatchApplication --|> org.springframework.boot.SpringApplication
+com.filterdata.BatchApplication --|> org.springframework.boot.autoconfigure.SpringBootApplication
+com.filterdata.BatchApplication --|> org.springframework.scheduling.annotation.EnableScheduling
+com.filterdata.BatchApplication --|> org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
+com.filterdata.BirthdayFilterProcessor --|> org.springframework.batch.item.ItemProcessor
+com.filterdata.Customer --|> java.io.Serializable
+com.filterdata.CustomerItemReader --|> org.springframework.batch.item.ItemReader
+com.filterdata.CustomerItemWriter --|> org.springframework.batch.item.ItemWriter
+com.filterdata.CustomerReportJobConfig --|> org.springframework.context.annotation.Configuration
+com.filterdata.CustomerReportJobConfig --|> org.springframework.scheduling.annotation.Scheduled
+com.filterdata.CustomerReportJobConfig --|> org.springframework.batch.core.explore.JobExplorer
+com.filterdata.CustomerReportJobConfig --|> org.springframework.batch.core.launch.JobLauncher
+com.filterdata.CustomerReportJobConfig --|> org.springframework.batch.core.configuration.annotation.JobBuilderFactory
+com.filterdata.CustomerReportJobConfig --|> org.springframework.batch.core.configuration.annotation.StepBuilderFactory
+com.filterdata.CustomerReportJobConfig --|> org.springframework.batch.core.Job
+com.filterdata.CustomerReportJobConfig --|> org.springframework.batch.core.Step
+com.filterdata.CustomerReportJobConfig --|> org.springframework.batch.core.tasklet.Tasklet
+com.filterdata.CustomerReportJobConfig --|> org.springframework.batch.item.ItemReader
+com.filterdata.CustomerReportJobConfig --|> org.springframework.batch.item.ItemProcessor
+com.filterdata.CustomerReportJobConfig --|> org.springframework.batch.item.ItemWriter
+com.filterdata.CustomerReportJobConfig --|> org.springframework.batch.item.support.CompositeItemProcessor
+com.filterdata.CustomerReportJobConfig --|> org.springframework.batch.repeat.RepeatStatus
+com.filterdata.TransactionValidatingProcessor --|> org.springframework.batch.item.validator.ValidatingItemProcessor
+
+@enduml
