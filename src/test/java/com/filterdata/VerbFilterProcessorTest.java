@@ -1,7 +1,5 @@
 package com.filterdata;
 
-import java.util.GregorianCalendar;
-
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
@@ -43,8 +41,8 @@ public class VerbFilterProcessorTest {
     public void filterId() throws Exception {
         final Article article = new Article();
         article.setId(1);
-        article.setName("name");
-        article.setBirthday(new GregorianCalendar());
+        article.setTitle("titke");
+        article.setAnnotation("annotation");
         final int id = StepScopeTestUtils.doInStepScope(
             getStepExecution(),
             () -> processor.process(article).getId()
