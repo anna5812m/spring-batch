@@ -1,0 +1,23 @@
+@startuml
+
+class Article {
+  +ID: int
+  +Title: String
+  +Annotation: String
+}
+
+class Verb {
+  +ID: int
+  +Text: String
+}
+
+class FilteredArticle {
+  +ID: int
+  -article: Article
+  -verbs: List<Verb>
+}
+
+Article --o{ Verb
+FilteredArticle --|> Article
+
+@enduml

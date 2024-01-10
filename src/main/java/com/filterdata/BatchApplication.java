@@ -3,11 +3,9 @@ package com.filterdata;
 import java.beans.XMLEncoder;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.GregorianCalendar;
-import java.util.LinkedList;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.boot.SpringApplication;
@@ -26,28 +24,51 @@ public class BatchApplication {
     }
 
     private static void prepareTestData(final int amount) {
-        final int actualYear = new GregorianCalendar().get(Calendar.YEAR);
-        final Collection<Customer> customers = new LinkedList<>();
+        final Collection<Article> articles = new LinkedList<>();
+        final Random random = new Random();
+
         for (int i = 1; i <= amount; i++) {
-            final Calendar birthday = new GregorianCalendar();
-            birthday.set(Calendar.YEAR, random(actualYear - 100, actualYear));
-            birthday.set(Calendar.DAY_OF_YEAR, random(1, birthday.getActualMaximum(Calendar.DAY_OF_YEAR)));
-            final Customer customer = new Customer();
-            customer.setId(i);
-            customer.setName(UUID.randomUUID().toString().replaceAll("[^a-z]", ""));
-            customer.setBirthday(birthday);
-            customer.setTransactions(random(0, 100));
-            customers.add(customer);
+            String title = generateRandomRussianWord();
+
+            String annotation = generateRandomSentence();
+
+            if (random.nextDouble() < 0.1) {
+                annotation += " " + getRandomVerb();
+            }
+
+            final Article article = new Article();
+            article.setId(i);
+            article.setTitle(title);
+            article.setAnnotation(annotation);
+            articles.add(article);
         }
-        try (final XMLEncoder encoder = new XMLEncoder(new FileOutputStream(CustomerReportJobConfig.XML_FILE))) {
-            encoder.writeObject(customers);
+
+        try (final XMLEncoder encoder = new XMLEncoder(new FileOutputStream(ArticleReportJobConfig.XML_FILE))) {
+            encoder.writeObject(articles);
         } catch (final FileNotFoundException e) {
             log.error(e.getMessage(), e);
             System.exit(-1);
         }
     }
 
-    private static int random(final int start, final int end) {
-        return start + (int) Math.round(Math.random() * (end - start));
+    private static String generateRandomRussianWord() {
+        int length = ThreadLocalRandom.current().nextInt(4, 10);
+        StringBuilder word = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            char randomChar = (char) ThreadLocalRandom.current().nextInt('а', 'я' + 1);
+            word.append(randomChar);
+        }
+        return word.toString();
     }
+
+    private static String generateRandomSentence() {
+        String[] words = { "аннотация", "этой", "статьи", "содержит", "слово", "для", "примера" };
+        return String.join(" ", Arrays.copyOfRange(words, 0, 5));
+    }
+
+    private static String getRandomVerb() {
+        String[] verbs = { "обнаруживать", "выявлять", "открывать", "оценивать", "сформулировать", "определить" };
+        return verbs[ThreadLocalRandom.current().nextInt(verbs.length)];
+    }
+
 }
